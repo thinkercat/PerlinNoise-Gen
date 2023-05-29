@@ -1,4 +1,6 @@
 import noise, random, os, json
+import tkinter as tk
+from tkinter import ttk
 from PIL import Image
 from datetime import datetime
 
@@ -50,7 +52,7 @@ def color_scale(type:str,value):
 
     return color
 
-def save(w, h):
+def save(w=100, h=100):
     # Create images
     img = Image.new('RGB', (w,h), 255)
     img2 = Image.new('RGB',(w,h), 255)
@@ -79,9 +81,25 @@ def save(w, h):
     js_data = json.dumps(data)
     with open(f'{path}properties.json','w') as f:
         f.write(js_data)
+        print(f"file save as in {path}")
 
+class App:
+    def __init__(self) -> None:
+        self.window = tk.Tk()
+        self.window.title("Perlin Noise Gen")
+        self.window.geometry("400x400")
 
+        self.btn_save = ttk.Button(master=self.window,text="Save",command=save)
+
+    def pack(self):
+        self.btn_save.pack()
+    
+    def run(self):
+        self.pack()
+        self.window.mainloop()
 
 
 if __name__ == '__main__':
-    save(200,200)
+    #save(1,1)
+    app = App()
+    app.run()
