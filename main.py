@@ -1,7 +1,7 @@
 import noise, random, os, json
 import tkinter as tk
 from tkinter import ttk
-from PIL import Image
+from PIL import Image, ImageTk
 from datetime import datetime
 
 # Perlin noise settings
@@ -11,7 +11,6 @@ persistence = 2.5
 lacunarity = 1.5
 
 seed = random.randint(0,10000*10000)
-
 def get_noise(x,y):
     value = noise.pnoise3(x / scale,
         y / scale,
@@ -83,23 +82,121 @@ def save(w=100, h=100):
         f.write(js_data)
         print(f"file save as in {path}")
 
-class App:
-    def __init__(self) -> None:
-        self.window = tk.Tk()
-        self.window.title("Perlin Noise Gen")
-        self.window.geometry("400x400")
 
-        self.btn_save = ttk.Button(master=self.window,text="Save",command=save)
 
-    def pack(self):
-        self.btn_save.pack()
+class App():
     
+    def __init__(self):
+
+        self.root = tk.Tk()
+        self.root.title("2D Perlin Noise")
+
+        self.content = ttk.Frame(self.root)
+        self.content.grid(column=0,row=0,sticky=(tk.N,tk.S,tk.E,tk.S))
+
+        self.seed = tk.IntVar()
+        self.seed.set(56)
+        self.seed_entry = ttk.Entry(self.content,textvariable=self.seed)
+        self.seed_entry.grid(column=0,row=1)
+        self.seed_newbtn = ttk.Button(self.content,text="New Seed",command=self.newseed)
+        self.seed_newbtn.grid(column=1,row=1)
+
+
+        self.scale = tk.DoubleVar()
+        self.scale.set(18.0)
+        self.scale_bar = ttk.Scale(self.content,orient='horizontal',length=200,variable=self.scale,from_=0.0, to=100.0)
+        self.scale_bar.grid(column=0,row=2)
+        self.scale_entry = ttk.Entry(self.content,textvariable=self.scale)
+        self.scale_entry.grid(column=1,row=2)
+        
+        self.octaves = tk.IntVar()
+        self.octaves.set(2)
+        self.octaves_bar = ttk.Scale(self.content,orient='horizontal',length=200,variable=self.octaves,from_=0, to=10)
+        self.octaves_bar.grid(column=0,row=3)
+        self.octaves_entry = ttk.Entry(self.content,textvariable=self.octaves)
+        self.octaves_entry.grid(column=1,row=3)
+
+        self.persistence = tk.DoubleVar()
+        self.persistence.set(2.5)
+        self.persistence_bar = ttk.Scale(self.content,orient='horizontal',length=200,variable=self.persistence,from_=0.0, to=10.0)
+        self.persistence_bar.grid(column=0,row=4)
+        self.persistence_entry = ttk.Entry(self.content,textvariable=self.persistence)
+        self.persistence_entry.grid(column=1,row=4)
+
+        self.lacunarity = tk.DoubleVar()
+        self.lacunarity.set(1.5)
+        self.lacunarity_bar = ttk.Scale(self.content,orient='horizontal',length=200,variable=self.lacunarity,from_=0.0, to=10.0)
+        self.lacunarity_bar.grid(column=0,row=5)
+        self.lacunarity_entry = ttk.Entry(self.content,textvariable=self.lacunarity)
+        self.lacunarity_entry.grid(column=1,row=5)
+
+
+        
+        self.render_btn = ttk.Button(self.content,text="render",command=self.makerender)
+        self.render_btn.grid(column=3,row=8)
+        self.render_canvas = tk.Canvas(self.content,width=500,height=500)
+        self.render_canvas.grid(column=3,row=1,columnspan=6,rowspan=6)
+        self.render_canvas.update_idletasks()
+        
+        self.renderstyle_list = ('grey','map')
+        self.renderstyle_listbox = tk.Listbox(self.content,listvariable=self.renderstyle_list,height=1)
+        self.renderstyle_listbox.grid(column=3,row=2,rowspan=6)
+        self.renderstyle_listbox.selection_set(0)
+
+
+    def makerender(self):
+        canvas = self.render_canvas
+        for x in range(canvas.winfo_width()):
+            for y in range(canvas.winfo_height()):
+                value = self.get_noise(x,y)
+                canvas.create_line(x, y,x+1,y,fill=self.color_scale('world',value))
+
+    def color_scale(self,type:str,value):
+        c = int((value+1) * 128)
+        c = max(0,min(255,c))
+        if type == 'world':
+            if c < 10:
+                color = '#1d3557'
+            elif c < 100:
+                color = '#457b9d'
+            elif c < 110:
+                color = '#a8dadc'
+            elif c < 120:
+                color = '#fefae0'
+            elif c < 150:
+                color = '#606c38'
+            elif c < 170:
+                color = '#283618'
+            elif c < 200:
+                color = '#bcb8b1'
+            elif c < 230:
+                color = '#463f3a'
+            else:
+                color = '#fef3ee'     
+        else:
+            color = f'#{hex(c)}{hex(c)}{hex(c)}'
+
+        return color
+    def get_noise(self,x,y):
+        value = noise.pnoise3(x / self.scale.get(),
+                            y / self.scale.get(),
+                            self.seed.get(),
+                            octaves=self.octaves.get(),
+                            persistence=self.persistence.get(),
+                            lacunarity=self.lacunarity.get(),
+                            repeatx=x,
+                            repeaty=y,
+                            base=0)
+    
+        return value
+    
+    def newseed(self):
+        self.seed.set(random.randint(0,10000))
+        
     def run(self):
-        self.pack()
-        self.window.mainloop()
+        self.root.mainloop()
 
 
 if __name__ == '__main__':
-    #save(1,1)
     app = App()
     app.run()
