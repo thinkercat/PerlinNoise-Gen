@@ -131,17 +131,12 @@ class App():
         self.lacunarity_entry.grid(column=1,row=5)
 
 
-        
         self.render_btn = ttk.Button(self.content,text="render",command=self.makerender)
         self.render_btn.grid(column=3,row=8)
+
         self.render_canvas = tk.Canvas(self.content,width=500,height=500)
         self.render_canvas.grid(column=3,row=1,columnspan=6,rowspan=6)
         
-
-        self.renderstyle_list = ('grey','map')
-        self.renderstyle_listbox = tk.Listbox(self.content,listvariable=self.renderstyle_list,height=1)
-        self.renderstyle_listbox.grid(column=3,row=2,rowspan=6)
-        self.renderstyle_listbox.selection_set(0)
 
 
     def makerender(self):
