@@ -136,8 +136,8 @@ class App():
         self.render_btn.grid(column=3,row=8)
         self.render_canvas = tk.Canvas(self.content,width=500,height=500)
         self.render_canvas.grid(column=3,row=1,columnspan=6,rowspan=6)
-        self.render_canvas.update_idletasks()
         
+
         self.renderstyle_list = ('grey','map')
         self.renderstyle_listbox = tk.Listbox(self.content,listvariable=self.renderstyle_list,height=1)
         self.renderstyle_listbox.grid(column=3,row=2,rowspan=6)
@@ -150,6 +150,7 @@ class App():
             for y in range(canvas.winfo_height()):
                 value = self.get_noise(x,y)
                 canvas.create_line(x, y,x+1,y,fill=self.color_scale('world',value))
+            canvas.update()
 
     def color_scale(self,type:str,value):
         c = int((value+1) * 128)
